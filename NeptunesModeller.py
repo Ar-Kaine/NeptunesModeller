@@ -100,8 +100,8 @@ class Connection:
         
 class Game:
     
-    def __init__(self, players = [], production = 20, model_ships = 10000, model_level = 10):
-        self.players = players
+    def __init__(self, production = 20, model_ships = 10000, model_level = 10):
+        self.players = []
         self.production = production
         self.model =  ( model_level, model_ships)
         self.alliances = {}

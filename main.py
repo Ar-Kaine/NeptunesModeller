@@ -112,4 +112,4 @@ teams = {'Manufacturing Lead' : [                                               
 if __name__ == "__main__":
     
     model = NeptunesModeller.Model(teams, production_number=80)
-    model.runModel('output2.csv')
+    model.runModel('./outputs/output2.csv')
