@@ -326,11 +326,20 @@ class PlayerModel:
     def setTech(self, level, techs = DEFAULT_TECH.keys()):
         '''Sets technologies in techs to level. Does not affect researched amount'''
         for i in techs:
-            self.techs[i]['level'] = level 
+            self.techs[i]['level'] = level
+            self.techs[i]['research'] = 0
         if 'terraforming'  in techs:
             self.refreshStars()
         self.refresh()
     
+    def buyTech(self, tech):
+        '''Buys the next level of technology if funds are available'''
+        current_level = self.techs[tech]['level']
+        tech_cost = current_level * 15
+        if tech_cost <= self.funds:
+            self.funds -= tech_cost
+            self.setTech(current_level + 1, [tech])
+        
     def addShips(self, ships):
         '''Adds a number of ships evenly distributed amongst the stars'''
         shipsPerStar = ships // len(self.stars)
@@ -404,15 +413,18 @@ class PlayerModel:
         return int((cost[infratype] * (1 / resources)) * level)
     
     
-    def buyInfra(self, infratype, funds, stars = None, bought = 0):
+    def buyInfra(self, infratype, funds, stars = None, bought = 0, forecast=False):
         '''Buys the chepeast infratype until it runs out of funds, returning remaining funds'''
+        
+        if forecast:
+            return copy.deepcopy(self).buyInfra(infratype, funds, stars, bought)
         
         if funds > self.funds:
             funds = self.funds
         
         if stars == None:
             stars = self.stars
-            
+        
         stars = sorted(stars, key = lambda x : self.priceInfra(infratype, x))
         
         cost = self.priceInfra(infratype, stars[0])
@@ -426,7 +438,6 @@ class PlayerModel:
             self.funds -= cost
             self.refresh()
             return self.buyInfra(infratype, funds, stars, bought)
-        
         
 
         

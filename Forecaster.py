@@ -19,9 +19,5 @@ if __name__ == "__main__":
     
     connection = nm.Connection(filename = config_file)
     player = connection.createPlayer()
-    
-    
-    
-    
-
+ 
 
