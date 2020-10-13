@@ -107,6 +107,41 @@ class Connection:
         #to implement
         raise NotImplementedError('not implemented')
         
+    def createPlayer(self,spend=SPEND,priorities=None):
+        '''Returns a PlayerModel representing the active player'''
+        #'researching' is a value only on the active player
+        active_player = [i for i in self.players.values() if 'researching' in i.keys()][0]
+        
+        if not priorities:
+            priorities = [active_player['researching']]
+            
+        player_stars = self.getPlayerStars(active_player['uid'])
+        
+        max_ships = max([i['total_strength'] for i in self.players.values()])
+        max_weapons = max([i['tech']['weapons']['level'] for i in self.players.values()])
+        
+        game = Game(production = self.time['production_rate'],
+                    model_ships = max_ships,
+                    model_level = max_weapons)
+            
+        player = PlayerModel(team = None,
+                             game = game,
+                             name = active_player['alias'],
+                             stars = player_stars,
+                             techs = active_player['tech'],
+                             priorities = priorities,
+                             funds = active_player['cash'],
+                             spend = spend,
+                             carriers = active_player['total_fleets'],
+                             )
+        
+        return player
+        
+    def getPlayerStars(self, puid):
+        return [v for k,v in self.stars.items() if v['puid'] == puid]
+        
+        
+        
 class Game:
     
     def __init__(self, production = 20, model_ships = 10000, model_level = 10):
@@ -368,12 +403,6 @@ class PlayerModel:
         level = star[infratype] + 1
         return int((cost[infratype] * (1 / resources)) * level)
     
-    # def buy_infra(self, infratype, planet):
-    #     ic = infratype + "_cost"
-    #     cost = planet[ic]
-    #     planet[infratype] = planet[infratype] + 1
-    #     planet[ic] = infra_cost(infratype, planet['r'], planet[infratype] + 1 )
-    #     return cost
     
     def buyInfra(self, infratype, funds, stars = None, bought = 0):
         '''Buys the chepeast infratype until it runs out of funds, returning remaining funds'''
@@ -383,6 +412,7 @@ class PlayerModel:
         
         if stars == None:
             stars = self.stars
+            
         stars = sorted(stars, key = lambda x : self.priceInfra(infratype, x))
         
         cost = self.priceInfra(infratype, stars[0])
@@ -396,6 +426,8 @@ class PlayerModel:
             self.funds -= cost
             self.refresh()
             return self.buyInfra(infratype, funds, stars, bought)
+        
+        
 
         
     def spendFunds(self):

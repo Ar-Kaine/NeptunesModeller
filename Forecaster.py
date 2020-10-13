@@ -16,7 +16,9 @@ config_file = './inputs/forecaster.json'
 #Run the script wihout editting the below
 if __name__ == "__main__":
     
+    
     connection = nm.Connection(filename = config_file)
+    player = connection.createPlayer()
     
     
     
