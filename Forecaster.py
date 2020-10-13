@@ -16,7 +16,7 @@ import NeptunesModeller as nm
 #   "game_id": 111111111111111111, 
 #   "api_key": "1aaAAaa"
 # }
-config_file = './inputs/forecaster_omicron.json'
+config_file = './inputs/forecaster_roger.json'
 
 #Run the script wihout editting the below
 if __name__ == "__main__":
@@ -41,13 +41,15 @@ if __name__ == "__main__":
     initial_funds = player.funds
     no_terra = player.buyInfra('e', player.funds, forecast=True)
 
-    player.buyTech('terraforming')
+    result = player.buyTech('terraforming')
     
     bought_level = player.techs['terraforming']['level']
     bought_funds = player.funds
     with_terra = player.buyInfra('e', player.funds, forecast=True)
     
-    if (no_terra['bought'] <= with_terra['bought'] and
+    if not result:
+        conclusion = 'Insufficient funds to buy terraforming'
+    elif (no_terra['bought'] <= with_terra['bought'] and
         no_terra['funds']  <= with_terra['funds']):
         conclusion = 'Buy terraforming now'
     else:
@@ -58,9 +60,10 @@ if __name__ == "__main__":
     print('Without terraforming:')
     print('Economy Bought: ', no_terra['bought'])
     print('Funds Remaining: ', no_terra['funds'])
-    print()
-    print('With terraforming:')
-    print('Economy Bought: ', with_terra['bought'])
-    print('Funds Remaining: ', with_terra['funds'])
+    if result:
+        print()
+        print('With terraforming:')
+        print('Economy Bought: ', with_terra['bought'])
+        print('Funds Remaining: ', with_terra['funds'])
     print()
     print(conclusion)

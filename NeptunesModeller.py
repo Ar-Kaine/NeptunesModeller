@@ -339,7 +339,10 @@ class PlayerModel:
         if tech_cost <= self.funds:
             self.funds -= tech_cost
             self.setTech(current_level + 1, [tech])
-        self.refresh()
+            self.refresh()
+            return True
+        return False
+        
         
     def addShips(self, ships):
         '''Adds a number of ships evenly distributed amongst the stars'''
