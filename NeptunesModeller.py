@@ -8,6 +8,7 @@ import requests
 import math
 import pandas as pd
 import csv
+import json
 import copy
 import random
 import statistics
@@ -51,10 +52,18 @@ SPEND = {'e' : 2 , 'i' : 3, 's' : 5 , 'o' : 3}
 
 class Connection:
     '''Handles connecting to the API to extract real data from the system'''
-    def __init__(self, game, apicode):
-        '''Parses the API information. Most lists are stored as attributes, time and game settings as dictionaries'''
-        self.game = game
-        self.apicode = apicode
+    def __init__(self, game_id=None, api_key=None, filename=None):
+        '''Parses the API information and stores it in the connection. 
+        
+        Most lists are stored as attributes, time and game settings as dictionaries'''
+        if game_id and api_key:
+            self.game_id = game_id
+            self.api_key = api_key
+        elif filename:
+            config = json.load(open(filename, 'r'))
+            self.game_id = config['game_id']
+            self.api_key = config['api_key']
+ 
         data = self.getData()
         
         self.name = data.pop('name')
@@ -86,8 +95,8 @@ class Connection:
 
         root = "https://np.ironhelmet.com/api"
         
-        params = {"game_number" : self.game,
-                 "code" : self.apicode,
+        params = {"game_number" : self.game_id,
+                 "code" : self.api_key,
                  "api_version" : "0.1"}
             
         return requests.post(root, params).json()['scanning_data']
@@ -442,7 +451,7 @@ class Model:
                  tech_level = 3,
                  ships = 100,
                  max_stars = 500,
-                 new_stars = 0):
+                 new_stars = 5):
         self.teams = teams
         self.production_rate = production_rate
         self.production_number = production_number
@@ -450,6 +459,7 @@ class Model:
         self.tech_level = tech_level
         self.ships = ships
         self.max_stars = max_stars
+        self.new_stars = new_stars
         self.last_run = None
 
 
