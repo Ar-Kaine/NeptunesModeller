@@ -339,6 +339,7 @@ class PlayerModel:
         if tech_cost <= self.funds:
             self.funds -= tech_cost
             self.setTech(current_level + 1, [tech])
+        self.refresh()
         
     def addShips(self, ships):
         '''Adds a number of ships evenly distributed amongst the stars'''
@@ -413,11 +414,15 @@ class PlayerModel:
         return int((cost[infratype] * (1 / resources)) * level)
     
     
-    def buyInfra(self, infratype, funds, stars = None, bought = 0, forecast=False):
+    def buyInfra(self, infratype, funds, stars = None, bought = 0, forecast=False): #TODO Bug: Forecast doesn't work
         '''Buys the chepeast infratype until it runs out of funds, returning remaining funds'''
+
         
         if forecast:
-            return copy.deepcopy(self).buyInfra(infratype, funds, stars, bought)
+          
+            dup = copy.deepcopy(self)
+
+            return dup.buyInfra(infratype, funds, stars, bought)
         
         if funds > self.funds:
             funds = self.funds
