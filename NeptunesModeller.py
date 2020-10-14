@@ -449,10 +449,12 @@ class PlayerModel:
         
 
         
-    def spendFunds(self):
+    def spendFunds(self, forecast = False):
         '''Spends all funds according to the spending priorities set''' 
         #Uses total funds if no number has been provided
-                 
+        
+
+        funds = self.funds         
         spending = copy.deepcopy(self.spend)
         total_priorities = sum(spending.values())
         ratio = self.funds // total_priorities
@@ -469,14 +471,14 @@ class PlayerModel:
         
         #handles normal infra
         for k,v in spending.items():
-            purchase = self.buyInfra(k,v)
+            purchase = self.buyInfra(k,v, forecast=forecast)
             total_spend = v - purchase['funds']         
             results[k] = {'bought' : purchase['bought'], 'spent' : total_spend}
         
         #buys econ with the remaining funds
-        remaining_funds = self.funds
-        purchase = self.buyInfra('e', self.funds)
-        total_spend = remaining_funds - purchase['funds']       
+        funds = funds - sum([i['spent'] for i in results.values()]) 
+        purchase = self.buyInfra('e', funds, forecast=forecast)
+        total_spend = funds - purchase['funds']       
         results['e']['bought' ] += purchase['bought']
         results['e']['spent'] += total_spend
         
