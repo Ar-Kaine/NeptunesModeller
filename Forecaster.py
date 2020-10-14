@@ -2,10 +2,18 @@
 """
 Created on Tue Oct 13 15:20:32 2020
 
-This script is used to forecast whether is is worth purchasing Terraforming
-before production, or if you should wait until afterwards.
+This script is used to forecas what infrastructure you will be able to build
+when spending your funds
 
-Modes:
+Config File:
+ #Change the config filepath to one that has your Game ID and API Key. The 
+#file needs to be a .json file that looks like this (you can create it in any
+#text editor)
+# {
+#   "game_id": 111111111111111111, 
+#   "api_key": "1aaAAaa",
+#   "spend_ratio" : {"e": 3, "i": 3, "s": 3, "o": 1}
+# }
     
 
 
@@ -14,13 +22,10 @@ Modes:
 import NeptunesModeller as nm
 import json
 
-
-#Change the config filepath to one that has your Game ID and API Key
-# {
-#   "game_id": 111111111111111111, 
-#   "api_key": "1aaAAaa"
-# }
+#Change this field to the filepath you need
 config_file = './inputs/forecaster_roger.json'
+
+
 
 #Run the script wihout editting the below
 
@@ -84,40 +89,3 @@ if __name__ == "__main__":
     printResults(results_terra)
    
     
-
-    
-    
-    
-    
-    
-    
-    # initial_level = player.techs['terraforming']['level']
-    # initial_funds = player.funds
-    # no_terra = player.buyInfra('e', player.funds, forecast=True)
-
-    # result = player.buyTech('terraforming')
-    
-    # bought_level = player.techs['terraforming']['level']
-    # bought_funds = player.funds
-    # with_terra = player.buyInfra('e', player.funds, forecast=True)
-    
-    # if not result:
-    #     conclusion = 'Insufficient funds to buy terraforming'
-    # elif (no_terra['bought'] <= with_terra['bought'] and
-    #     no_terra['funds']  <= with_terra['funds']):
-    #     conclusion = 'Buy terraforming now'
-    # else:
-    #     conclusion = 'Buy terraforming after production'
-    
-    # print('Terraforming forecast.')
-    # print()
-    # print('Without terraforming:')
-    # print('Economy Bought: ', no_terra['bought'])
-    # print('Funds Remaining: ', no_terra['funds'])
-    # if result:
-    #     print()
-    #     print('With terraforming:')
-    #     print('Economy Bought: ', with_terra['bought'])
-    #     print('Funds Remaining: ', with_terra['funds'])
-    # print()
-    # print(conclusion)
