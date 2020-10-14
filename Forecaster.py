@@ -23,7 +23,7 @@ import NeptunesModeller as nm
 import json
 
 #Change this field to the filepath you need
-config_file = './inputs/forecaster_roger.json'
+config_file = './inputs/forecaster_hallos.json'
 
 
 

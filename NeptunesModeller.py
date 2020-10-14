@@ -504,7 +504,8 @@ class Model:
                  tech_level = 3,
                  ships = 100,
                  max_stars = 500,
-                 new_stars = 5):
+                 new_stars = 5,
+                 runs = 1):
         self.teams = teams
         self.production_rate = production_rate
         self.production_number = production_number
@@ -514,42 +515,45 @@ class Model:
         self.max_stars = max_stars
         self.new_stars = new_stars
         self.last_run = None
+        self.runs = runs
 
 
     def runModel(self, filepath):  
-    
-        game = Game(production = self.production_rate)
-        self.last_run = game
-        game.createModel(self.model['weapons'], self.model['ships'])
-      
-        for k,v in self.teams.items():
-            team = k
-            for i in v:
-                name = i['name']
-                priorities = i['researching']
-                spend = i['spending']
-                funds = i['funds']
-                target_stars = i['stars']
-                game.addPlayer(team, name, priorities, spend, funds, target_stars=target_stars)
-
-                
-        game.setTech(self.tech_level)
-
-       
-        for i in range(self.max_stars): #TODO maximum stars is currently manual
-            game.addStar()
-        
-        game.addShips(self.ships)
-        game.spendFunds()
-        
         results = []
-        for i in range(self.production_number):
-            game.advanceDay()
-            for p in game.players:
-                entry = p.toDict()
-                entry['Production'] = i
-                results.append(entry)
-                
+        for r in range(self.runs):
+            game = Game(production = self.production_rate)
+            self.last_run = game
+            game.createModel(self.model['weapons'], self.model['ships'])
+          
+            for k,v in self.teams.items():
+                team = k
+                for i in v:
+                    name = i['name']
+                    priorities = i['researching']
+                    spend = i['spending']
+                    funds = i['funds']
+                    target_stars = i['stars']
+                    game.addPlayer(team, name, priorities, spend, funds, target_stars=target_stars)
+    
+                    
+            game.setTech(self.tech_level)
+    
+           
+            for i in range(self.max_stars): #TODO maximum stars is currently manual
+                game.addStar()
+            
+            game.addShips(self.ships)
+            game.spendFunds()
+            
+            
+            for i in range(self.production_number):
+                game.advanceDay()
+                for p in game.players:
+                    entry = p.toDict()
+                    entry['Production'] = i
+                    entry['Run'] = r
+                    results.append(entry)
+                    
         pd.DataFrame(results).to_csv(filepath)
         
   

@@ -9,8 +9,9 @@ This is very much a work in progress. Speak to me in Discord (Kaine) or elsewher
 This is the main engine that drives other scripts. Running this file will do nothing: it is the common code used by the other files. 
 
 ## Forecaster
-The forecaster is currently setup to answer a single question: should I buy terraforming before I invest in economy, or should I wait to buy terraforming after production?
+The Forecaster allows you to set your spending priorities and see what you can build by spending all of your cash. 
 
-The user needs to save a config.json file somewhere, with a game ID and API key so it can read their data. In the script, change the filepath for the config file to match your file, then run the script. The results will be printed to the console. 
+Spending priorities are setup as a ratio of e (economy), i (industry), s (science) and o (other). If you want to do it as cash rather than ratio, just do the maths so the total adds up to your total funds. This assumes you are always building in the least expensive location
 
+The Forecaster will print the results for what you will build, at what price and how much is remaining, for both your current terraforming level and the next one up. This assumes you bought the level, so funds for purchasing that level will be subtracted. 
 
