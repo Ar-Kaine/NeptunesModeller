@@ -30,6 +30,7 @@ config_file = './inputs/forecaster_roger.json'
 #Run the script wihout editting the below
 
 def forecastSpend(player):
+    '''Runs a forecast of the spend for the player'''
     
     funds = player.funds
     results = player.spendFunds(forecast=True)
@@ -39,12 +40,14 @@ def forecastSpend(player):
     return results
 
 def printResults(result):
+     '''Prints results from the spending forecast'''
+    
      print('Spending with terraforming level:', result['terra'])
      print('   Economy:   ', result['e']['bought'], ' for $', result['e']['spent'], sep='')
      print('   Industry:  ', result['i']['bought'], ' for $', result['i']['spent'], sep='')
      print('   Science:   ', result['s']['bought'], ' for $', result['s']['spent'], sep='')
      print('   Other:     ', 'Spent $', result['o']['spent'], sep='')
-     print('Remaining Funds:', result['funds'], sep='')
+     print('   Remaining: $', result['funds'], sep='')
      print()
                
 if __name__ == "__main__":
