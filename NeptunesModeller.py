@@ -13,7 +13,7 @@ import copy
 import random
 import statistics
 
-
+#Game settings information and conversions used across different objects
 INFRATYPES = {'i' : 'Industry',
               'e' : 'Economy',
               's' : 'Science'}
@@ -48,10 +48,17 @@ TECHNOLOGIES = ('scanning',
                 'manufacturing')
 
 
-SPEND = {'e' : 2 , 'i' : 3, 's' : 5 , 'o' : 3}
+SPEND = {'e' : 2 , 'i' : 2, 's' : 2, 'o' : 1}
 
 class Connection:
-    '''Handles connecting to the API to extract real data from the system'''
+    '''Handles connecting to the API to extract real data from the system
+    
+    Connection can either be passed a game_id or api_key, or a .json file
+    with the information in. The data that is pulled from the API will be in 
+    a very similar format to the original API data, except that each type
+    of data (e.g. players, stars, settings) is split into a separate attribute
+    
+    '''
     def __init__(self, game_id=None, api_key=None, filename=None):
         '''Parses the API information and stores it in the connection. 
         
@@ -91,7 +98,15 @@ class Connection:
         self.settings = data
 
     def getData(self):
-        '''Returns Dict object for all game data'''
+        '''Access the Neputune's Pride API and returns the JSON result
+        
+        This provides the API data as is with no changes or edits to the format.
+        The data will by and large reflect the details in the Connection object,
+        but this can be used if you prefer the raw format for whatever reason.
+        It will use the same details as the Connection was set up with to access
+        the data.
+        
+        '''
 
         root = "https://np.ironhelmet.com/api"
         
@@ -103,12 +118,29 @@ class Connection:
     
     
     def toExcel(self):
-        '''Writes the data from the connection to a multi-sheet excel document. Not implemented'''
-        #to implement
+        '''Writes the data from the connection to a multi-sheet excel document. 
+        
+        Not implemented
+        '''
         raise NotImplementedError('not implemented')
         
     def createPlayer(self,spend=SPEND,priorities=None):
-        '''Returns a PlayerModel representing the active player'''
+        '''Returns a PlayerModel representing the active player
+        
+        The created PlayerModel willl match to the game settings, stars and
+        technologies (including progress) that exist in the current game. 
+        
+        Spend can be used to set spending priorities if you plan to model or forecast:
+        a dictionary with the ratio of spending type (e,i,s,o) should be provided.
+        If spend is not set on creation, it will have spending priorities set to
+        equal across the different infrastructure types. 
+        
+        Priorities sets the research priorities for the player. If not provided
+        it will assume the player is sticking with the same technology. If this
+        is not true, provide a list of the technologies that the player will 
+        research - they will always research the lowest tech. 
+        
+        '''
         #'researching' is a value only on the active player
         active_player = [i for i in self.players.values() if 'researching' in i.keys()][0]
         
@@ -138,6 +170,7 @@ class Connection:
         return player
         
     def getPlayerStars(self, puid):
+        '''Returns a list of stars owned by the player with the ID provided'''
         return [v for k,v in self.stars.items() if v['puid'] == puid]
         
         
