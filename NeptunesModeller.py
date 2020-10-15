@@ -2,7 +2,8 @@
 """
 Created on Thu Jul 30 14:34:05 2020
 
-@author: jamie
+@author: Jamie
+@auhor: Kaine
 """
 import requests
 import math
@@ -12,6 +13,9 @@ import json
 import copy
 import random
 import statistics
+import openpyxl as xl
+
+
 
 #Game settings information and conversions used across different objects
 INFRATYPES = {'i' : 'Industry',
@@ -117,12 +121,36 @@ class Connection:
         return requests.post(root, params).json()['scanning_data']
     
     
-    def toExcel(self):
+    def toExcel(self, filepath):
         '''Writes the data from the connection to a multi-sheet excel document. 
         
         Not implemented
         '''
-        raise NotImplementedError('not implemented')
+        stars = pd.DataFrame(self.stars).transpose()
+        players = copy.deepcopy(self.players)
+        
+        for i in players.values():
+            techs = i.pop('tech')
+            for k,v in techs.items():
+                i[k] = v['level']
+                
+            if 'war' in i.keys():
+                i.pop('countdown_to_war')
+                i.pop('war')
+
+        players = pd.DataFrame(players).transpose()
+        #TODO implement settings page
+        
+        writer = pd.ExcelWriter(filepath)
+        
+        stars.to_excel(writer, 'stars')
+        players.to_excel(writer, 'players')
+        
+        writer.save()
+    
+    
+    
+    
         
     def createPlayer(self,spend=SPEND,priorities=None):
         '''Returns a PlayerModel representing the active player
