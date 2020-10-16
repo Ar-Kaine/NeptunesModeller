@@ -23,11 +23,12 @@ The config file should have the api_key, game_id and output_location fields.
 Data is currently almost untouched from the original API format. The only changes are:
 
 Players:
-1) Removal of the "war" and "count down to war" fields that are linked to the main player
-2) Main player progress on technologies is not shown
+1) Removal of the "war" and "count down to war" fields to a separate sheet (player_war)
+2) Main player progress on technologies moved to a separate sheet  (player_technology)
 3) Research levels have been split out to just so each tech level against a player
 
 Stars:
 1) Addition of a "distance" field to stars, which is the distance of the star to the centre
+
 
 All other fields are in their original format. 

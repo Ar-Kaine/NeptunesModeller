@@ -142,11 +142,27 @@ class Connection:
         timeset.update(copy.deepcopy(self.time))
         timeset = pd.Series(timeset)
         
+        puid = str(self.settings['player_uid'])
+        
+        techs = pd.DataFrame(self.players[puid]['tech']).transpose()
+        
+        #Parses the war information which is spread in weird ways
+        war = []
+        
+        for k in self.players[puid]['war']:
+            row = {'player_id' : k ,
+                   'war' : self.players[puid]['war'][k],
+                   'countdown_to_war' : self.players[puid]['countdown_to_war'][k]}
+            war.append(row)
+        war = pd.DataFrame(war)
+        
         writer = pd.ExcelWriter(filepath)
 
         timeset.to_excel(writer,'settings')        
         stars.to_excel(writer, 'stars')
         players.to_excel(writer, 'players')
+        techs.to_excel(writer, 'player_technology')
+        war.to_excel(writer, 'player_war')
 
         
         writer.save()
