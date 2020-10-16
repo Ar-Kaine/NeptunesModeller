@@ -15,3 +15,19 @@ Spending priorities are setup as a ratio of e (economy), i (industry), s (scienc
 
 The Forecaster will print the results for what you will build, at what price and how much is remaining, for both your current terraforming level and the next one up. This assumes you bought the level, so funds for purchasing that level will be subtracted. 
 
+## Downloader
+The downloader handles connecting to the API and downloads the data to Excel.
+
+The config file should have the api_key, game_id and output_location fields. 
+
+Data is currently almost untouched from the original API format. The only changes are:
+
+Players:
+1) Removal of the "war" and "count down to war" fields that are linked to the main player
+2) Main player progress on technologies is not shown
+3) Research levels have been split out to just so each tech level against a player
+
+Stars:
+1) Addition of a "distance" field to stars, which is the distance of the star to the centre
+
+All other fields are in their original format. 

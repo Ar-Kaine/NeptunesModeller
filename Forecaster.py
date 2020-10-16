@@ -15,19 +15,17 @@ Config File:
 #   "spend_ratio" : {"e": 3, "i": 3, "s": 3, "o": 1}
 # }
     
-
-
 @author: jamie
 """
-import NeptunesModeller as nm
-import json
 
 #Change this field to the filepath you need
 config_file = './inputs/forecaster_hallos.json'
 
 
-
 #Run the script wihout editting the below
+import NeptunesModeller as nm
+import json
+
 
 def forecastSpend(player):
     '''Runs a forecast of the spend for the player'''

@@ -150,8 +150,6 @@ class Connection:
     
     
     
-    
-        
     def createPlayer(self,spend=SPEND,priorities=None):
         '''Returns a PlayerModel representing the active player
         
