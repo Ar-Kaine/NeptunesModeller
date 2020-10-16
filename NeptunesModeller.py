@@ -8,12 +8,10 @@ Created on Thu Jul 30 14:34:05 2020
 import requests
 import math
 import pandas as pd
-import csv
 import json
 import copy
 import random
 import statistics
-import openpyxl as xl
 
 
 
@@ -139,12 +137,17 @@ class Connection:
                 i.pop('war')
 
         players = pd.DataFrame(players).transpose()
-        #TODO implement settings page
+        
+        timeset = copy.deepcopy(self.settings)
+        timeset.update(copy.deepcopy(self.time))
+        timeset = pd.Series(timeset)
         
         writer = pd.ExcelWriter(filepath)
-        
+
+        timeset.to_excel(writer,'settings')        
         stars.to_excel(writer, 'stars')
         players.to_excel(writer, 'players')
+
         
         writer.save()
     
