@@ -58,6 +58,8 @@ import NeptunesModeller
 #                   'stars'      : 25 ,        
 #                   'funds'      : 500,  
 #                   'spending'   :  {'e' : 3 , 'i' : 3, 's' : 3 , 'o' : 2}}]}
+
+
   
 teams = {'Econ Heavy'       : [       
                 {'name'       : 'Big Terra',                                     
@@ -128,5 +130,5 @@ teams = {'Econ Heavy'       : [
                   'spending'   :  {'e' : 3 , 'i' : 3, 's' : 6 , 'o' : 2}}]}      
 if __name__ == "__main__":
     
-    model = NeptunesModeller.Model(teams, production_number=80, runs=5)
+    model = NeptunesModeller.Model(teams, production_number=20, runs=1)
     model.runModel('./outputs/output2.csv')

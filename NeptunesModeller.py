@@ -18,7 +18,8 @@ import statistics
 #Game settings information and conversions used across different objects
 INFRATYPES = {'i' : 'Industry',
               'e' : 'Economy',
-              's' : 'Science'}
+              's' : 'Science',
+              'o' : 'Other'}
 
 INFRACOST =  {'e' : 500,
               'i' : 1000,
@@ -575,11 +576,11 @@ class PlayerModel:
 
 class Model:
     def __init__(self,                
-                 teams,
+                 teams = None,
                  production_rate = 20,
                  production_number= 40,
                  model = {"weapons" : 10, "ships" : 10000},
-                 tech_level = 3,
+                 tech_level = 1,
                  ships = 100,
                  max_stars = 500,
                  new_stars = 5,
@@ -595,7 +596,41 @@ class Model:
         self.last_run = None
         self.runs = runs
 
-
+    @staticmethod
+    def loadFromFile(model_config, teams_excel):
+        
+        def convert_priorities(string):
+            result = string.split(sep=",")
+            result = [i.replace(' ', '') for i in result]
+            result = tuple(result)
+            return result
+        
+        config = {
+                 "production_rate" : 20,
+                 "production_number" : 40,
+                 "model" : {"weapons" : 10, "ships" : 10000},
+                 "tech_level" : 1,
+                 "ships" : 100,
+                 "max_stars" : 500,
+                 "new_stars" : 5,
+                 "runs" : 1
+                 }
+        
+        teams = pd.read_excel(teams_excel, 
+                              converters = {'priorities' : convert_priorities})
+        
+        teams = teams.transpose().to_dict()
+        teams = [v for v in teams.values()]
+        
+        for i in teams:
+            spend = {}
+            for k in INFRATYPES.keys():
+                spend[k] = i.pop(k)
+            i['spend'] = spend
+            
+        
+        return teams
+        
     def runModel(self, filepath):  
         results = []
         for r in range(self.runs):
