@@ -576,7 +576,7 @@ class PlayerModel:
 
 class Model:
     def __init__(self,                
-                 teams = None,
+                 teams,
                  production_rate = 20,
                  production_number= 40,
                  model = {"weapons" : 10, "ships" : 10000},
@@ -597,8 +597,10 @@ class Model:
         self.runs = runs
 
     @staticmethod
-    def loadFromFile(model_config, teams_excel):
+    def loadFromFile(config, teams):
+        '''Returns a Model using settings from config and teams files'''
         
+        #Helper function to convert comma sep fields to tuple
         def convert_priorities(string):
             result = string.split(sep=",")
             result = [i.replace(' ', '') for i in result]
@@ -616,7 +618,7 @@ class Model:
                  "runs" : 1
                  }
         
-        teams = pd.read_excel(teams_excel, 
+        teams = pd.read_excel(teams, 
                               converters = {'priorities' : convert_priorities})
         
         teams = teams.transpose().to_dict()
@@ -628,8 +630,16 @@ class Model:
                 spend[k] = i.pop(k)
             i['spend'] = spend
             
-        
-        return teams
+
+        return Model(teams = teams,
+                     production_rate = config['production_rate'],
+                     production_number= config['production_number'],
+                     model = config['model'],
+                     tech_level = config['tech_level'],
+                     ships = config['ships'],
+                     max_stars = config['max_stars'],
+                     new_stars = config['new_stars'],
+                     runs = config['runs'])
         
     def runModel(self, filepath):  
         results = []
@@ -638,16 +648,15 @@ class Model:
             self.last_run = game
             game.createModel(self.model['weapons'], self.model['ships'])
           
-            for k,v in self.teams.items():
-                team = k
-                for i in v:
-                    name = i['name']
-                    priorities = i['researching']
-                    spend = i['spending']
-                    funds = i['funds']
-                    target_stars = i['stars']
-                    game.addPlayer(team, name, priorities, spend, funds, target_stars=target_stars)
-    
+            for i in self.teams:
+                team = i['team']
+                name = i['name']
+                priorities = i['priorities']
+                spend = i['spend']
+                funds = i['funds']
+                target_stars = i['stars']
+                game.addPlayer(team, name, priorities, spend, funds, target_stars=target_stars)
+
                     
             game.setTech(self.tech_level)
     
