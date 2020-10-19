@@ -607,16 +607,6 @@ class Model:
             result = tuple(result)
             return result
         
-        config = {
-                 "production_rate" : 20,
-                 "production_number" : 40,
-                 "model" : {"weapons" : 10, "ships" : 10000},
-                 "tech_level" : 1,
-                 "ships" : 100,
-                 "max_stars" : 500,
-                 "new_stars" : 5,
-                 "runs" : 1
-                 }
         
         teams = pd.read_excel(teams, 
                               converters = {'priorities' : convert_priorities})

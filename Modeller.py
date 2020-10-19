@@ -6,12 +6,15 @@ Created on Fri Oct  9 17:05:03 2020
 """
 
 from NeptunesModeller import Model
+import json
 
-config = {'output' : './outputs/teams_test.csv'}
+config = "./config templates/modeller_template.json"
 teams = "./inputs/team_spending.xlsx"
 
 
 if __name__ == "__main__":
+    
+    config = json.load(open(config,'r'))
     
     model = Model.loadFromFile(config, teams)
     model.runModel(config['output'])
