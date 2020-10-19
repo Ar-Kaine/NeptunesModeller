@@ -5,13 +5,13 @@ Created on Fri Oct  9 17:05:03 2020
 @author: jamie
 """
 
-import NeptunesModeller
+from NeptunesModeller import Model
 
-#This is currently non-functioning
+config = {'output' : './outputs/teams_test.csv'}
+teams = "./inputs/team_spending.xlsx"
 
 
-                  'spending'   :  {'e' : 3 , 'i' : 3, 's' : 6 , 'o' : 2}}]}      
 if __name__ == "__main__":
     
-    model = NeptunesModeller.Model(teams, production_number=20, runs=1)
-    model.runModel('./outputs/output2.csv')
+    model = Model.loadFromFile(config, teams)
+    model.runModel(config['output'])
