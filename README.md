@@ -13,7 +13,7 @@ The Forecaster allows you to set your spending priorities and see what you can b
 
 Spending priorities are setup as a ratio of e (economy), i (industry), s (science) and o (other). If you want to do it as cash rather than ratio, just do the maths so the total adds up to your total funds. This assumes you are always building in the least expensive location
 
-The Forecaster will print the results for what you will build, at what price and how much is remaining, for both your current terraforming level and the next one up. This assumes you bought the level, so funds for purchasing that level will be subtracted. 
+The Forecaster will print to the console results for what you will build, at what price and how much is remaining, for both your current terraforming level and the next one up. This assumes you bought the level, so funds for purchasing that level will be subtracted. 
 
 ## Downloader
 The downloader handles connecting to the API and downloads the data to Excel.
@@ -30,6 +30,11 @@ Players:
 Stars:
 1) Addition of a "distance" field to stars, which is the distance of the star to the centre
 
+### Downloader: Known Issues
+1) The error messages when a connection has failed are not  clear. If you get a "scanning_data" key error, it means your API key/Game ID combo did not work. You may need to regenerate an API key.
+
+
+
 
 All other fields are in their original format. 
 
@@ -40,6 +45,7 @@ At it's core is the concept of "model strength". This compares the strength of a
 
 Users will need to create an excel file with the relevant team information, and a config file with the settings for the model.
 
-Known issues:
+### Modeller: Known issues:
 1) Config file is currently overriding certain information (starting techs and stars)
 2) Some redundant information is in the config file and not used
+3) Increasing Stars is in the config file but not yet in the modeller

@@ -619,19 +619,20 @@ class Model:
             for k in INFRATYPES.keys():
                 spend[k] = i.pop(k)
             i['spend'] = spend
-            
+            roduction_number'],
+                     model = config['model'],
+                     tech_level = config['tech_level'],
 
         return Model(teams = teams,
                      production_rate = config['production_rate'],
-                     production_number= config['production_number'],
-                     model = config['model'],
-                     tech_level = config['tech_level'],
+                     production_number= config['p
                      ships = config['ships'],
                      max_stars = config['max_stars'],
                      new_stars = config['new_stars'],
                      runs = config['runs'])
         
     def runModel(self, filepath):  
+        '''Runs a scenario based upon the model settings and saves the results to the filepath'''
         results = []
         for r in range(self.runs):
             game = Game(production = self.production_rate)
