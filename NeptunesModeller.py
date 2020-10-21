@@ -336,10 +336,12 @@ class Game:
 class PlayerModel:
     
     def __init__(self, team, name, game, 
-                 stars = DEFAULT_STARS , researching='scanning', 
+                 stars = DEFAULT_STARS , 
+                 researching='scanning', 
                  techs = DEFAULT_TECH, priorities=TECHNOLOGIES, 
                  funds = 300, spend=SPEND, carriers = 1,
-                 target_stars = 50):
+                 target_stars = 6,
+                 ships = 50):
         self.team = team
         self.name = name
         self.game = game
@@ -619,13 +621,13 @@ class Model:
             for k in INFRATYPES.keys():
                 spend[k] = i.pop(k)
             i['spend'] = spend
-            roduction_number'],
-                     model = config['model'],
-                     tech_level = config['tech_level'],
+
 
         return Model(teams = teams,
                      production_rate = config['production_rate'],
-                     production_number= config['p
+                     production_number= config['production_number'],
+                     model = config['model'],
+                     tech_level = config['tech_level'],
                      ships = config['ships'],
                      max_stars = config['max_stars'],
                      new_stars = config['new_stars'],
