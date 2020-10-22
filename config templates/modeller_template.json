@@ -1,12 +1,12 @@
 {
 "production_rate" : 20,
 "production_number" : 40,
-"model" : {"weapons" : 10, "ships" : 10000},
+"model" : {"weapons" : 20, "ships" : 20000},
 "tech_level" : 1,
 "ships" : 100,
-"max_stars" : 500,
-"new_stars" : 5,
-"runs" : 10,
-"output" : "./outputs/test_output_modeller.csv"
+"star_growth" : 5,
+"growth_type" : "conquest",
+"runs" : 1,
+"output" : "./outputs/test_output_modeller2.csv"
 }
 

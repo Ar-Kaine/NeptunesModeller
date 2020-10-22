@@ -19,7 +19,7 @@ Config File:
 """
 
 #Change this field to the filepath you need
-config_file = './inputs/forecaster_hallos.json'
+config_file = './inputs/forecaster_skull_snackbar.json'
 
 
 #Run the script wihout editting the below

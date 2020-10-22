@@ -233,7 +233,7 @@ class Game:
         '''adds a new player with name to the game'''
         
         if not priorities:
-            priorities = DEFAULT_TECH.keys()
+            priorities = list(DEFAULT_TECH.keys())
         if not spend:
             spend = SPEND
         self.players.append(PlayerModel(team = team,
@@ -249,7 +249,12 @@ class Game:
         for i in self.players:
             i.setTech(level, techs)
     
-    def addStar(self, player = None, i = 0, s = 0):
+    def addStar(self, player = None, e = 0, i = 0, s = 0, growth=False):
+        '''Generates a star and adds it to player, or an identical star to each player
+        
+        If the player is already at their target stars, it will not add a star unless growth is set to True
+        '''
+        
         
         quality = random.choice(('bad','good'))
         if quality == 'bad':
@@ -260,12 +265,17 @@ class Game:
         else:
             resources = random.randint(14,49)
             
-        star = {'c': 0.0, 'e': 0, 'i': i, 's': s, 'r': resources, 'ga': 0, 'nr': resources, 'st': 0}
+        star = {'c': 0.0, 'e': e, 'i': i, 's': s, 'r': resources, 'ga': 0, 'nr': resources, 'st': 0}
+
         
         if player:
+            if growth:
+                player.target_stars += 1
             player.addStar(star)
         else:
             for i in self.players:
+                if growth:
+                    i.target_stars += 1
                 if i.target_stars > len(i.stars):
                     i.addStar(star)
                 
@@ -401,7 +411,7 @@ class PlayerModel:
         else:
             raise TypeError('Keys incorrect for star')
             
-        self.refreshStars()
+        self.refresh()
     
     
     def setTech(self, level, techs = DEFAULT_TECH.keys()):
@@ -584,8 +594,8 @@ class Model:
                  model = {"weapons" : 10, "ships" : 10000},
                  tech_level = 1,
                  ships = 100,
-                 max_stars = 500,
-                 new_stars = 5,
+                 star_growth = 5,
+                 growth_type = 'new',
                  runs = 1):
         self.teams = teams
         self.production_rate = production_rate
@@ -593,8 +603,8 @@ class Model:
         self.model = model
         self.tech_level = tech_level
         self.ships = ships
-        self.max_stars = max_stars
-        self.new_stars = new_stars
+        self.star_growth = star_growth
+        self.growth_type = growth_type
         self.last_run = None
         self.runs = runs
 
@@ -629,8 +639,8 @@ class Model:
                      model = config['model'],
                      tech_level = config['tech_level'],
                      ships = config['ships'],
-                     max_stars = config['max_stars'],
-                     new_stars = config['new_stars'],
+                     star_growth = config['star_growth'],
+                     growth_type = config['growth_type'],
                      runs = config['runs'])
         
     def runModel(self, filepath):  
@@ -654,7 +664,7 @@ class Model:
             game.setTech(self.tech_level)
     
            
-            for i in range(self.max_stars): #TODO maximum stars is currently manual
+            for i in range(500): 
                 game.addStar()
             
             game.addShips(self.ships)
@@ -662,6 +672,25 @@ class Model:
             
             
             for i in range(self.production_number):
+                if self.star_growth > 0:
+                    if self.growth_type == 'conquest':
+                        all_stars = [copy.deepcopy(j) for i in game.players for j in i.stars ]
+                        eco = statistics.mean(i['e'] for i in all_stars)
+                        ind = statistics.mean(i['i'] for i in all_stars)
+                        sci = statistics.mean(i['s'] for i in all_stars)
+                 
+                    elif self.growth_type == 'new':
+                        eco = 0
+                        ind = 0
+                        sci = 0
+                    else:
+                        raise ValueError('Unknown value for growth_type: use "conquest" or "new"')
+                        
+                    for r in range(self.star_growth):
+                        game.addStar(i=ind, s=sci, growth=True)
+                    for p in game.players:
+                        p.addFunds(eco * self.star_growth * 10)
+                        
                 game.advanceDay()
                 for p in game.players:
                     entry = p.toDict()
