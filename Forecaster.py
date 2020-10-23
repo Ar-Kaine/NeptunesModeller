@@ -7,7 +7,7 @@ when spending your funds
 
 Config File:
  #Change the config filepath to one that has your Game ID and API Key. The 
-#file needs to be a .json file that looks like this (you can create it in any
+play#file needs to be a .json file that looks like this (you can create it in any
 #text editor)
 # {
 #   "game_id": 111111111111111111, 
@@ -19,7 +19,7 @@ Config File:
 """
 
 #Change this field to the filepath you need
-config_file = './inputs/forecaster_skull_snackbar.json'
+config_file = './inputs/forecaster_skull.json'
 
 
 #Run the script wihout editting the below
@@ -44,7 +44,7 @@ def printResults(result):
      print('   Economy:   ', result['e']['bought'], ' for $', result['e']['spent'], sep='')
      print('   Industry:  ', result['i']['bought'], ' for $', result['i']['spent'], sep='')
      print('   Science:   ', result['s']['bought'], ' for $', result['s']['spent'], sep='')
-     print('   Other:     ', 'Spent $', result['o']['spent'], sep='')
+     print('   Other:     ', result['o']['bought'], ' for $', result['o']['spent'], sep='')
      print('   Remaining: $', result['funds'], sep='')
      print()
                
@@ -55,6 +55,7 @@ if __name__ == "__main__":
     connection = nm.Connection(config['game_id'], config['api_key'])
     player = connection.createPlayer(spend = config['spend_ratio'])
     
+    player.funds=2000 #debug
     #The below is a test model instead of an active game. Replace the config
     # details to run a test model instead
     
@@ -70,6 +71,7 @@ if __name__ == "__main__":
     
     #Forecasting results
     results_current = forecastSpend(player)
+    
     
     player.buyTech('terraforming')
     results_terra = forecastSpend(player)

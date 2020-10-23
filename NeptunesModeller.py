@@ -508,18 +508,20 @@ class PlayerModel:
         return int((cost[infratype] * (1 / resources)) * level)
     
     
-    def buyInfra(self, infratype, funds, stars = None, bought = 0, forecast=False): #TODO Bug: Forecast doesn't work
-        '''Buys the chepeast infratype until it runs out of funds, returning remaining funds'''
-
+    def buyInfra(self, infratype, funds, stars = None, bought = 0, forecast=False): 
+        '''Buys the cheapest infratype until it runs out of funds, returning remaining funds'''
         
-        if forecast:
-          
+        if forecast == True:
             dup = copy.deepcopy(self)
-
             return dup.buyInfra(infratype, funds, stars, bought)
+        
         
         if funds > self.funds:
             funds = self.funds
+            
+        if infratype == 'o':
+            self.funds -= funds
+            return {'type' : infratype, 'funds' : 0, 'bought' : 0}
         
         if stars == None:
             stars = self.stars
@@ -528,8 +530,8 @@ class PlayerModel:
         
         cost = self.priceInfra(infratype, stars[0])
         
-        if funds <= cost:
-            return {'funds' : funds, 'bought' : bought}
+        if funds < cost:
+            return {'type' : infratype, 'funds' : funds, 'bought' : bought}
         else:
             stars[0][infratype] += 1
             funds -= cost
@@ -540,44 +542,37 @@ class PlayerModel:
         
 
         
-    def spendFunds(self, forecast = False):
+    def spendFunds(self, forecast = False, remainder='e'):
         '''Spends all funds according to the spending priorities set''' 
-        #Uses total funds if no number has been provided
+        #TODO Uses total funds if no number has been provided
+        #TODO expect bug is from using funds not self.funds
+        print('DEBUG', self)
         
+        if forecast == True:
+            player = copy.deepcopy(self)
+            return player.spendFunds(forecast=False)
 
-        funds = self.funds         
-        spending = copy.deepcopy(self.spend)
-        total_priorities = sum(spending.values())
+        total_priorities = sum(self.spend.values())
         ratio = self.funds // total_priorities
         
         results = {}
         
-        for k,v in spending.items():
-            spending[k] = v * ratio
-        
-        #handles Other
-        spent = spending.pop('o')
-        bought = 0
-        results['o'] = {'bought': bought, 'spent' : spent}
-        
-        #handles normal infra
-        for k,v in spending.items():
-            purchase = self.buyInfra(k,v, forecast=forecast)
-            total_spend = v - purchase['funds']         
-            results[k] = {'bought' : purchase['bought'], 'spent' : total_spend}
-        
-        #buys econ with the remaining funds
-        funds = funds - sum([i['spent'] for i in results.values()]) 
-        purchase = self.buyInfra('e', funds, forecast=forecast)
-        total_spend = funds - purchase['funds']       
-        results['e']['bought' ] += purchase['bought']
-        results['e']['spent'] += total_spend
-        
+        for k,v in self.spend.items():
+            funds = ratio * v
+            purchase = self.buyInfra(k, funds)
+            results[k] = {'bought' : purchase['bought'], 
+                          'spent'  : funds - purchase['funds']}        
+        #Remainder spend 
+        funds = self.funds
+        purchase = self.buyInfra(remainder, funds)
+        results[remainder]['bought'] += purchase['bought']
+        results[remainder]['spent'] += funds - purchase['funds']
+  
         self.refresh()
+        print('DEBUG', self)
         return results
         
-     
-
+    
     def runProduction(self):
         income = self.total_economy * 10
         self.funds += income
