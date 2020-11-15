@@ -546,8 +546,7 @@ class PlayerModel:
         '''Spends all funds according to the spending priorities set''' 
         #TODO Uses total funds if no number has been provided
         #TODO expect bug is from using funds not self.funds
-        print('DEBUG', self)
-        
+
         if forecast == True:
             player = copy.deepcopy(self)
             return player.spendFunds(forecast=False)
@@ -569,15 +568,13 @@ class PlayerModel:
         results[remainder]['spent'] += funds - purchase['funds']
   
         self.refresh()
-        print('DEBUG', self)
+
         return results
         
     
     def runProduction(self):
         income = self.total_economy * 10
         self.funds += income
-        
-        
         self.refresh()
         
 
@@ -641,7 +638,7 @@ class Model:
     def runModel(self, filepath):  
         '''Runs a scenario based upon the model settings and saves the results to the filepath'''
         results = []
-        for r in range(self.runs):
+        for run in range(self.runs):
             game = Game(production = self.production_rate)
             self.last_run = game
             game.createModel(self.model['weapons'], self.model['ships'])
@@ -670,9 +667,9 @@ class Model:
                 if self.star_growth > 0:
                     if self.growth_type == 'conquest':
                         all_stars = [copy.deepcopy(j) for i in game.players for j in i.stars ]
-                        eco = statistics.mean(i['e'] for i in all_stars)
-                        ind = statistics.mean(i['i'] for i in all_stars)
-                        sci = statistics.mean(i['s'] for i in all_stars)
+                        eco = int(statistics.mean(i['e'] for i in all_stars))
+                        ind = int(statistics.mean(i['i'] for i in all_stars))
+                        sci = int(statistics.mean(i['s'] for i in all_stars))
                  
                     elif self.growth_type == 'new':
                         eco = 0
@@ -690,11 +687,11 @@ class Model:
                 for p in game.players:
                     entry = p.toDict()
                     entry['Production'] = i
-                    entry['Run'] = r
+                    entry['Run'] = run
                     results.append(entry)
                     
         pd.DataFrame(results).to_csv(filepath)
-        
+        return results
   
 
 

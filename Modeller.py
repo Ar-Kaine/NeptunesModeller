@@ -10,8 +10,8 @@ import json
 
 
 #Change these to the filepaths for your teams and config templates
-config = "./config templates/modeller_template.json"
-teams = "./inputs/team_other.xlsx"
+config = "./inputs//modeller_10k10.json"
+teams = "./inputs/team_science.xlsx"
 
 
 #Run this script without changing anything below
@@ -20,4 +20,4 @@ if __name__ == "__main__":
     config = json.load(open(config,'r'))
     
     model = Model.loadFromFile(config, teams)
-    model.runModel(config['output'])
+    results = model.runModel(config['output'])

@@ -19,16 +19,22 @@ play#file needs to be a .json file that looks like this (you can create it in an
 """
 
 #Change this field to the filepath you need
-config_file = './inputs/forecaster_skull.json'
+config_file = './inputs/forecaster_32ultra.json'
 
 
 #Run the script wihout editting the below
 import NeptunesModeller as nm
 import json
+import copy
 
 
-def forecastSpend(player):
+def forecastSpend(player,terra=0):
     '''Runs a forecast of the spend for the player'''
+    
+    player = copy.deepcopy(player)
+    
+    for i in range(terra):
+        player.buyTech('terraforming')
     
     funds = player.funds
     results = player.spendFunds(forecast=True)
@@ -55,7 +61,6 @@ if __name__ == "__main__":
     connection = nm.Connection(config['game_id'], config['api_key'])
     player = connection.createPlayer(spend = config['spend_ratio'])
     
-    player.funds=2000 #debug
     #The below is a test model instead of an active game. Replace the config
     # details to run a test model instead
     
@@ -69,12 +74,6 @@ if __name__ == "__main__":
     # player = game.players[0]
     
     
-    #Forecasting results
-    results_current = forecastSpend(player)
-    
-    
-    player.buyTech('terraforming')
-    results_terra = forecastSpend(player)
     
     
     #Printing results to console
@@ -88,7 +87,7 @@ if __name__ == "__main__":
     print('   Science: ', config['spend_ratio']['s'])
     print('   Other:   ', config['spend_ratio']['o'])    
     print()
-    printResults(results_current)
-    printResults(results_terra)
-   
+    printResults(forecastSpend(player,0))
+    printResults(forecastSpend(player,1))
+    printResults(forecastSpend(player,2))
     
