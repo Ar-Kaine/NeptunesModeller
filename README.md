@@ -48,4 +48,3 @@ Users will need to create an excel file with the relevant team information, and 
 ### Modeller: Known issues:
 1) Config file is currently overriding certain information (starting techs and stars)
 2) Some redundant information is in the config file and not used
-3) Increasing Stars is in the config file but not yet in the modeller
