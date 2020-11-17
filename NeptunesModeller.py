@@ -228,6 +228,7 @@ class Game:
         self.production = production
         self.model =  ( model_level, model_ships)
         self.alliances = {}
+        self.production_count = 0
         
     def addPlayer(self,team,  name, priorities=None, spend=None, funds = 500, target_stars=50):
         '''adds a new player with name to the game'''
@@ -324,7 +325,8 @@ class Game:
     def production(self):
         for i in self.players:
             i.runProduction()
-            
+
+        
     def shareTech(self):   #TODO Costs for sharing tech
         for player_giving in self.players:
             for player_receiving in self.players:
@@ -341,6 +343,7 @@ class Game:
             p.spendFunds()
             p.runProduction()
         self.shareTech()
+        self.production_count += 1
                        
             
 class PlayerModel:
@@ -364,6 +367,7 @@ class PlayerModel:
         self.target_stars = target_stars
         self.refreshTotals()
         self.refreshStars()
+        self.spend_history = []
 
         
     def __str__(self):
@@ -529,7 +533,8 @@ class PlayerModel:
         stars = sorted(stars, key = lambda x : self.priceInfra(infratype, x))
         
         cost = self.priceInfra(infratype, stars[0])
-        
+      
+        #TODO add spend history entry
         if funds < cost:
             return {'type' : infratype, 'funds' : funds, 'bought' : bought}
         else:
@@ -538,6 +543,7 @@ class PlayerModel:
             bought += 1
             self.funds -= cost
             self.refresh()
+         
             return self.buyInfra(infratype, funds, stars, bought)
         
 
@@ -568,7 +574,16 @@ class PlayerModel:
         results[remainder]['spent'] += funds - purchase['funds']
   
         self.refresh()
-
+        
+        history_entry = [{'production' : self.game.production_count,
+                         'type'       : k,
+                         'bought'     : v['bought'],
+                         'spent'      : v['spent']}
+                         
+                         for k,v in results.items()
+                         ]
+        self.spend_history.append(history_entry)
+        
         return results
         
     
@@ -688,6 +703,13 @@ class Model:
                     entry = p.toDict()
                     entry['Production'] = i
                     entry['Run'] = run
+                    for h in p.spend_history[-1]:
+                            entry[h['type'] + ' Bought'] = h['bought']
+                            entry[h['type'] + ' Spent'] = h['spent']
+                            try:
+                                entry[h['type'] + ' Average'] =  h['spent'] / h['bought']
+                            except ZeroDivisionError:
+                                entry[h['type'] + ' Average'] = 0
                     results.append(entry)
                     
         pd.DataFrame(results).to_csv(filepath)
