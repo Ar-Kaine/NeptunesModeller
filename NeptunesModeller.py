@@ -230,7 +230,7 @@ class Game:
         self.alliances = {}
         self.production_count = 0
         
-    def addPlayer(self,team,  name, priorities=None, spend=None, funds = 500, target_stars=50):
+    def addPlayer(self,team,  name, priorities=None, spend=None, funds = 500, target_stars=50, growth_modifier = 1):
         '''adds a new player with name to the game'''
         
         if not priorities:
@@ -244,7 +244,8 @@ class Game:
                                         researching = priorities[0],
                                         target_stars = target_stars,
                                         funds = funds,
-                                        spend = spend))
+                                        spend = spend,
+                                        growth_modifier = growth_modifier))
                     
     def setTech(self, level, techs = DEFAULT_TECH.keys()):
         for i in self.players:
@@ -279,6 +280,31 @@ class Game:
                     i.target_stars += 1
                 if i.target_stars > len(i.stars):
                     i.addStar(star)
+                    
+                    
+    def growStars(self, x, growth_type = 'conquest'):
+        '''Adds x new stars to each player. x is modified by the player growth modifier'''
+        
+        max_mod = int(max([i.growth_modifier for i in self.players]))
+        for i in self.players:
+            i.target_stars += (x * i.growth_modifier)
+            if growth_type == 'conquest':
+                all_stars = [copy.deepcopy(j) for i in self.players for j in i.stars ]
+                eco = int(statistics.mean(i['e'] for i in all_stars))
+                ind = int(statistics.mean(i['i'] for i in all_stars))
+                sci = int(statistics.mean(i['s'] for i in all_stars))
+         
+            elif self.growth_type == 'new':
+                eco = 0
+                ind = 0
+                sci = 0
+            else:
+                raise ValueError('Unknown value for growth_type: use "conquest" or "new"')
+            
+            for r in range(x * max_mod):
+                self.addStar(i=ind, s=sci, growth=False)
+                #TODO add econ cash gain
+        
                 
     def addShips(self, ships):
         for i in self.players:
@@ -354,7 +380,8 @@ class PlayerModel:
                  techs = DEFAULT_TECH, priorities=TECHNOLOGIES, 
                  funds = 300, spend=SPEND, carriers = 1,
                  target_stars = 6,
-                 ships = 50):
+                 ships = 50,
+                 growth_modifier = 1):
         self.team = team
         self.name = name
         self.game = game
@@ -368,6 +395,7 @@ class PlayerModel:
         self.refreshTotals()
         self.refreshStars()
         self.spend_history = []
+        self.growth_modifier = growth_modifier
 
         
     def __str__(self):
@@ -665,7 +693,10 @@ class Model:
                 spend = i['spend']
                 funds = i['funds']
                 target_stars = i['stars']
-                game.addPlayer(team, name, priorities, spend, funds, target_stars=target_stars)
+                growth_modifier= i['growth']
+                game.addPlayer(team, name, priorities, spend, funds, 
+                               target_stars = target_stars,
+                               growth_modifier = growth_modifier)
 
                     
             game.setTech(self.tech_level)
@@ -679,24 +710,7 @@ class Model:
             
             
             for i in range(self.production_number):
-                if self.star_growth > 0:
-                    if self.growth_type == 'conquest':
-                        all_stars = [copy.deepcopy(j) for i in game.players for j in i.stars ]
-                        eco = int(statistics.mean(i['e'] for i in all_stars))
-                        ind = int(statistics.mean(i['i'] for i in all_stars))
-                        sci = int(statistics.mean(i['s'] for i in all_stars))
-                 
-                    elif self.growth_type == 'new':
-                        eco = 0
-                        ind = 0
-                        sci = 0
-                    else:
-                        raise ValueError('Unknown value for growth_type: use "conquest" or "new"')
-                        
-                    for r in range(self.star_growth):
-                        game.addStar(i=ind, s=sci, growth=True)
-                    for p in game.players:
-                        p.addFunds(eco * self.star_growth * 10)
+                game.growStars(self.star_growth, self.growth_type)
                         
                 game.advanceDay()
                 for p in game.players:
