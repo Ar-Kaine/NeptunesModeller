@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
+"""and 
 Created on Tue Oct 13 15:20:32 2020
 
 This script is used to forecas what infrastructure you will be able to build
@@ -20,6 +20,7 @@ play#file needs to be a .json file that looks like this (you can create it in an
 
 #Change this field to the filepath you need
 config_file = './inputs/forecaster_32ultra.json'
+terra_levels = 2
 
 
 #Run the script wihout editting the below
@@ -87,7 +88,7 @@ if __name__ == "__main__":
     print('   Science: ', config['spend_ratio']['s'])
     print('   Other:   ', config['spend_ratio']['o'])    
     print()
-    printResults(forecastSpend(player,0))
-    printResults(forecastSpend(player,1))
-    printResults(forecastSpend(player,2))
     
+    for i in range(terra_levels):
+        printResults(forecastSpend(player,i))
+

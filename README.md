@@ -41,7 +41,7 @@ All other fields are in their original format.
 ## Modeller
 The modeller is used to model potential scenarios, such as which tech is best or the best division of spending.
 
-At it's core is the concept of "model strength". This compares the strength of a player's total fleet against a model player. The model player is at a fixed strength to allow comparison across time and between players. The model has a weapons level and total ship count (as set by the user). The resulting model_strength field is the number of ships the player has remaining when all of their fleet fights this model, or the number of ships the model has remaining if they lost the fight.
+At it's core is the concept of "model strength". This is a simple calculation of "weapons level * total ship number", which gives an easy comparison between players of how well their full fleet would perform in combat. 
 
 Users will need to create an excel file with the relevant team information, and a config file with the settings for the model.
 

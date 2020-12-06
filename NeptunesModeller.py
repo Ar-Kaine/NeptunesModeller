@@ -325,23 +325,25 @@ class Game:
             
     def modelStrength(self, player):
         
-        def battle(defenderTech, defenderShips, attackerTech, attackerShips):
-            while True:
-                attackerShips -= defenderTech + 1
-                if attackerShips <= 0:
-                    attackerShips = 0
-                    return (defenderShips, attackerShips)
-                defenderShips -= attackerTech
-                if defenderShips <= 0:
-                    defenderShips = 0
-                    return (defenderShips, attackerShips)
+        #Old model strength - to be removed
+        # def battle(defenderTech, defenderShips, attackerTech, attackerShips):
+        #     while True:
+        #         attackerShips -= defenderTech + 1
+        #         if attackerShips <= 0:
+        #             attackerShips = 0
+        #             return (defenderShips, attackerShips)
+        #         defenderShips -= attackerTech
+        #         if defenderShips <= 0:
+        #             defenderShips = 0
+        #             return (defenderShips, attackerShips)
             
     
-        results = battle(self.model[0], 
-                         self.model[1],
-                         player.techs['weapons']['level'], 
-                         player.total_strength)
-        return results[1] - results[0]
+        # results = battle(self.model[0], 
+        #                  self.model[1],
+        #                  player.techs['weapons']['level'], 
+        #                  player.total_strength)
+        # return results[1] - results[0]
+        return player.techs['weapons']['level']* player.total_strength
     
     def tick(self):
         if len(self.players) > 0:
