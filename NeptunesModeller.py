@@ -394,8 +394,7 @@ class PlayerModel:
         self.spend = spend
         self.researching = researching
         self.target_stars = target_stars
-        self.refreshTotals()
-        self.refreshStars()
+        self.refresh()
         self.spend_history = []
         self.growth_modifier = growth_modifier
 
@@ -422,6 +421,7 @@ class PlayerModel:
                'total_stars'    : self.total_stars,
                'star_quality'   : self.star_quality,
                'model_stength'  : self.model_strength,
+               'ships_per_tick' : self.ships_per_tick,
                'total_strength' : self.total_strength,
                'funds'          : self.funds,
                'total_science'  : self.total_science,
@@ -483,6 +483,14 @@ class PlayerModel:
     def refresh(self):
         self.refreshStars()
         self.refreshTotals()
+        if self.game == None:
+            ticks = 20
+        else:
+            ticks = self.game.production
+            
+        tech = self.techs['manufacturing']['level']
+        self.ships_per_tick = (self.total_industry * ( 5 + tech) / ticks)
+    
     
     def refreshTotals(self):
         '''Refreshes total numbers based upon star data'''
