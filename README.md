@@ -5,8 +5,12 @@ The various tools in here use libraries that come as standard as part of the Ana
 
 This is very much a work in progress. Speak to me in Discord (Kaine) or elsewhere if you want more detail.
 
+Apart from NeptunsModeller, each of the tools in this library has been setup so you can run it using configuration files - either .json or .cab (or both). There are templates in the templates folder. You will need to change the code to point at the right file, but that's it.
+
 ## NeptunesModeller
 This is the main engine that drives other scripts. Running this file will do nothing: it is the common code used by the other files. 
+
+If you want to create your own tool using this code, reference this library.
 
 ## Forecaster
 The Forecaster allows you to set your spending priorities and see what you can build by spending all of your cash. 
