@@ -49,9 +49,25 @@ def connectToGoogle(folder=''):
 
 def getEmails(service, search_string):
     #TODO paginate request
-    message_ids = service.users().messages().list(userId='me',maxResults=10000, q=search_string).execute()['messages']
-    ids = [i['id'] for i in message_ids]
     
+    next_page = True
+    ids = []
+    query  = service.users().messages().list(userId='me',maxResults=500, q=search_string).execute()
+    
+    while True:
+    
+        ids += [i['id'] for i in query['messages']]    
+        if 'nextPageToken' in query.keys():
+            next_page = query['nextPageToken']
+
+            query  = service.users().messages().list(userId='me',
+                                                     maxResults=500,
+                                                     q=search_string, 
+                                                     pageToken=next_page).execute()
+           
+        else:
+            break
+              
     results = []
     
     for i in ids:
@@ -79,6 +95,7 @@ def parseEmail(email):
     else:
         return None
 
+#TODO convert all to integers
 def extractTable(email):
     soup = BeautifulSoup(email, 'html.parser')
     table = soup.find_all('table')[1]
@@ -120,6 +137,11 @@ def extractTable(email):
                  "Ships"     : ships,
                  "Carriers"  : carriers}
         results.append(entry)
+    
+    players = len(results)
+    for i in results:
+        i['GameSize'] = players
+    
     return results
     
 def getGameDetails(email):
@@ -136,13 +158,15 @@ def getGameDetails(email):
         if text.find(game_stem) == 0:
            gameid =  text[len(game_stem) : ]
     
+
+    #TODO functionise the name stripper    
+    #Checks if this is an end of game email
+    gameEnd = email.find('has ended!') >= 0
     
-    #TODO Checks if this is an end of game email
-    gameEnd = False
-    
-    #TODO implement game end logic
     if gameEnd:
-        name = "blank"
+        start = email.find("Subject: NP2: Game")
+        end = email.find('has ended!')
+        name = email[start+18:end].strip() 
         cycle = "End"
     else:
         start = email.find("Subject: NP2:")
@@ -151,7 +175,8 @@ def getGameDetails(email):
         cycle_index = title.find("Cycle")
         
         cycle = title[cycle_index + 5 :].strip()
-        name = title[13:cycle_index]
+        name = title[13:cycle_index].strip()
+        name = name[:-1]
         
     #Returns game details as a dict
     results = {'Id'     : gameid,
@@ -170,24 +195,21 @@ if __name__ == '__main__':
 
 
     queries = ['np2 "Galactic Cycle Complete"',
-               'NP2 "has ended"']
-    
+               'NP2 "has ended"']    
     
     service = connectToGoogle('./inputs/')
-    emails = getEmails(service, 'np2 "Galactic Cycle Complete"')
-    tables = [extractTable(i) for i in emails]
     
-    #temp to add dummy game IDs
+    tables = []
     
-    qtable = []
+    for i in queries:       
+        emails = getEmails(service, i)
+        result = []
+        for i in emails:
+            result += extractTable(i)
+        tables = tables + result
+
     
-    for i in range(len(tables)):
-        for r in tables[i]:
-            row = {'Game' : "Game Number " + str(i),
-                   'Player' : r['Player'],
-                   'Rank'   : r['Rank']}
-            qtable.append(row)
-        
+
 
 
 
