@@ -24,7 +24,7 @@ All other fields are in their original format.
 """
 
 #Edit this config file to be your input file
-config_file = './inputs/downloader_omega.json'
+config_file = './inputs/downloader_taucaph.json'
 
 #Run the file without touching anything below here
 

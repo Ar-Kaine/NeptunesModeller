@@ -11,7 +11,7 @@ import json
 
 #Change these to the filepaths for your teams and config templates
 config = "./inputs//modeller_10k10.json"
-teams = "./inputs/team_science.xlsx"
+teams = "./inputs/team_spending.xlsx"
 
 
 #Run this script without changing anything below
