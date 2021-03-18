@@ -12,7 +12,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 import base64
 from bs4 import BeautifulSoup
-import pandas
+import pandas as pd
 
 # If modifying these scopes, delete the file token.json.
 
