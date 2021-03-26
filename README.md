@@ -3,7 +3,7 @@ This is a collection of scripts for modelling, predicting or managing connection
 
 The various tools in here use libraries that come as standard as part of the Anacondas distribution of Python. If you are not a python expert and want to use any of these tools, you will find it easiest if you install Anacondas as everything should run smoothly if you do. 
 
-This is very much a work in progress. Speak to me in Discord (Kaine) or elsewhere if you want more detail.
+While everything has been made generic, it is also a work in progress. Speak to me in Discord (Kaine) or elsewhere if you want more detail.
 
 Apart from NeptunsModeller, each of the tools in this library has been setup so you can run it using configuration files - either .json or .cab (or both). There are templates in the templates folder. You will need to change the code to point at the right file, but that's it.
 
