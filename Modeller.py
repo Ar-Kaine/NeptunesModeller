@@ -10,9 +10,8 @@ import json
 
 
 #Change these to the filepaths for your teams and config templates
-config = "./inputs//modeller_10k10.json"
-teams = "./inputs/team_spending.xlsx"
-
+config = "./inputs/modeller_10k10.json"
+teams = "./inputs/team_spending2.xlsx"
 
 #Run this script without changing anything below
 if __name__ == "__main__":

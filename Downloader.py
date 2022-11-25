@@ -18,13 +18,11 @@ Stars:
 
 All other fields are in their original format. 
 
-
-@author: jamie
 @author: Kaine
 """
 
 #Edit this config file to be your input file
-config_file = './inputs/downloader_taucaph.json'
+config_file = './inputs/downloader_pp.json'
 
 #Run the file without touching anything below here
 

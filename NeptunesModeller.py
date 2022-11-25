@@ -122,8 +122,6 @@ class Connection:
     
     def toExcel(self, filepath):
         '''Writes the data from the connection to a multi-sheet excel document. 
-        
-        Not implemented
         '''
         stars = pd.DataFrame(self.stars).transpose()
         players = copy.deepcopy(self.players)
@@ -157,6 +155,8 @@ class Connection:
             war.append(row)
         war = pd.DataFrame(war)
         
+        fleets = pd.DataFrame(self.fleets).transpose()
+        
         writer = pd.ExcelWriter(filepath)
 
         timeset.to_excel(writer,'settings')        
@@ -164,6 +164,7 @@ class Connection:
         players.to_excel(writer, 'players')
         techs.to_excel(writer, 'player_technology')
         war.to_excel(writer, 'player_war')
+        fleets.to_excel(writer, 'fleets')
 
         
         writer.save()
@@ -294,7 +295,7 @@ class Game:
                 ind = int(statistics.mean(i['i'] for i in all_stars))
                 sci = int(statistics.mean(i['s'] for i in all_stars))
          
-            elif self.growth_type == 'new':
+            elif growth_type == 'new':
                 eco = 0
                 ind = 0
                 sci = 0

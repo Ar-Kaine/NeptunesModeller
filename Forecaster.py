@@ -19,7 +19,7 @@ play#file needs to be a .json file that looks like this (you can create it in an
 """
 
 #Change this field to the filepath you need
-config_file = './inputs/forecaster_epizub_steely.json'
+config_file = './inputs/forecaster_general.json'
 terra_levels = 2
 
 
