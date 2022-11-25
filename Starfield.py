@@ -27,17 +27,19 @@ if __name__ == "__main__":
          star['y'] = float(i['y'])
          star['puid'] = int(i['puid'])
          
-         #Visible only - and try/except
+         #Visible only - and try/except#
          star['r'] = int(i['r'])
          star['ga'] = int(i['ga'])
-         star['e'] = int(i['ga'])
-         star['i'] = int(i['ga'])
-         star['r'] = int(i['ga'])                
+         star['e'] = int(i['e'])
+         star['i'] = int(i['i'])
+         star['s'] = int(i['s'])                
          star['st'] = int(i['st'])
-                             
-         #To add: Wormholes
-         
+         try:
+             star['wh'] = int(i['wh'])
+         except KeyError:
+             a  = 1
+             
          results.append(star)
          
      output = {"stars" : results}
-     json.dump(output, open(config["output_location"],'w'), indent=4)
+     json.dump(output, open(config["output_location"],'w'),indent=1)
