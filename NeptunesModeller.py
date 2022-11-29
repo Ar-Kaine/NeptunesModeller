@@ -69,10 +69,16 @@ class Connection:
         if game_id and api_key:
             self.game_id = game_id
             self.api_key = api_key
+        if game_id and api_key==None:
+            self.game_id = game_id
+            self.api_key = None
         elif filename:
             config = json.load(open(filename, 'r'))
             self.game_id = config['game_id']
-            self.api_key = config['api_key']
+            try:
+                self.api_key = config['api_key']
+            except KeyError:
+                self.api_key = None
  
         data = self.getData()
         
@@ -110,14 +116,21 @@ class Connection:
         the data.
         
         '''
-
-        root = "https://np.ironhelmet.com/api"
         
-        params = {"game_number" : self.game_id,
-                 "code" : self.api_key,
-                 "api_version" : "0.1"}
+        if self.api_key == None:
             
-        return requests.post(root, params).json()['scanning_data']
+            root = "http://nptriton.cqproject.net/game/" + str(self.game_id) + "/full"
+            return requests.post(root).json()
+    
+        else:
+            
+            root = "https://np.ironhelmet.com/api"
+            
+            params = {"game_number" : self.game_id,
+                     "code" : self.api_key,
+                     "api_version" : "0.1"}
+
+            return requests.post(root, params).json()['scanning_data']
     
     
     def toExcel(self, filepath):
@@ -143,17 +156,19 @@ class Connection:
         
         puid = str(self.settings['player_uid'])
         
-        techs = pd.DataFrame(self.players[puid]['tech']).transpose()
-        
-        #Parses the war information which is spread in weird ways
-        war = []
-        
-        for k in self.players[puid]['war']:
-            row = {'player_id' : k ,
-                   'war' : self.players[puid]['war'][k],
-                   'countdown_to_war' : self.players[puid]['countdown_to_war'][k]}
-            war.append(row)
-        war = pd.DataFrame(war)
+        if puid != "-1":
+            
+            techs = pd.DataFrame(self.players[puid]['tech']).transpose()
+            
+            #Parses the war information which is spread in weird ways
+            war = []
+            
+            for k in self.players[puid]['war']:
+                row = {'player_id' : k ,
+                       'war' : self.players[puid]['war'][k],
+                       'countdown_to_war' : self.players[puid]['countdown_to_war'][k]}
+                war.append(row)
+            war = pd.DataFrame(war)
         
         fleets = pd.DataFrame(self.fleets).transpose()
         
@@ -162,9 +177,13 @@ class Connection:
         timeset.to_excel(writer,'settings')        
         stars.to_excel(writer, 'stars')
         players.to_excel(writer, 'players')
-        techs.to_excel(writer, 'player_technology')
-        war.to_excel(writer, 'player_war')
         fleets.to_excel(writer, 'fleets')
+        
+        try:
+            techs.to_excel(writer, 'player_technology')
+            war.to_excel(writer, 'player_war')
+        except AttributeError:
+            pass
 
         
         writer.save()

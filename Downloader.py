@@ -22,7 +22,7 @@ All other fields are in their original format.
 """
 
 #Edit this config file to be your input file
-config_file = './inputs/downloader_pp.json'
+config_file = './inputs/downloader_public.json'
 
 #Run the file without touching anything below here
 
@@ -31,5 +31,8 @@ import json
 
 if __name__ == "__main__":
      config = json.load(open(config_file))
-     connection = Connection(config['game_id'], config['api_key'])
+     try:
+         connection = Connection(config['game_id'], config['api_key'])
+     except KeyError:
+         connection = Connection(config['game_id'])
      connection.toExcel(config['output_location'])
