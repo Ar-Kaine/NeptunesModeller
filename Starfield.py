@@ -15,7 +15,10 @@ import json
 
 if __name__ == "__main__":
      config = json.load(open(config_file))
-     connection = Connection(config['game_id'], config['api_key'])
+     try:
+         connection = Connection(config['game_id'], config['api_key'])
+     except KeyError:
+         connection = Connection(config['game_id'])
      
      results = []
      

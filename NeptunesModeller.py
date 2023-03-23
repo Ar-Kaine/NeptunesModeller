@@ -82,7 +82,7 @@ class Connection:
  
         data = self.getData()
         
-        self.name = data.pop('name')
+        self.name = data['name']
         self.fleets = data.pop('fleets')
         self.players =  data.pop('players')
         
@@ -119,7 +119,7 @@ class Connection:
         
         if self.api_key == None:
             
-            root = "http://nptriton.cqproject.net/game/" + str(self.game_id) + "/full"
+            root = "https://nptriton.qry.me/game/" + str(self.game_id) + "/full"
             return requests.post(root).json()
     
         else:
