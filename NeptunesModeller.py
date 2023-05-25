@@ -2,7 +2,7 @@
 """
 Created on Thu Jul 30 14:34:05 2020
 
-@author: Jamie
+S
 @auhor: Kaine
 """
 import requests
@@ -12,7 +12,7 @@ import json
 import copy
 import random
 import statistics
-
+import odf
 
 
 #Game settings information and conversions used across different objects
@@ -190,7 +190,7 @@ class Connection:
     
     
     
-    def createPlayer(self,spend=SPEND,priorities=None):
+    def createPlayer(self,player=None, spend=SPEND,priorities=None):
         '''Returns a PlayerModel representing the active player
         
         The created PlayerModel willl match to the game settings, stars and
@@ -207,8 +207,18 @@ class Connection:
         research - they will always research the lowest tech. 
         
         '''
-        #'researching' is a value only on the active player
-        active_player = [i for i in self.players.values() if 'researching' in i.keys()][0]
+        
+        if player == None:
+            #'researching' is a value only on the active playe
+            active_player = [i for i in self.players.values() if 'researching' in i.keys()][0]
+            
+        else:
+            active_player = self.players[str(player)]
+            main_player = [i for i in self.players.values() if 'researching' in i.keys()][0]
+            dif = [i for i in main_player.keys() if i not in active_player.keys()]
+            for i in dif:
+                active_player[i] = copy.deepcopy(main_player[i])
+            
         
         if not priorities:
             priorities = [active_player['researching']]
@@ -480,7 +490,7 @@ class PlayerModel:
     def buyTech(self, tech):
         '''Buys the next level of technology if funds are available'''
         current_level = self.techs[tech]['level']
-        tech_cost = current_level * 15
+        tech_cost = current_level * 25
         if tech_cost <= self.funds:
             self.funds -= tech_cost
             self.setTech(current_level + 1, [tech])
@@ -519,7 +529,10 @@ class PlayerModel:
         self.total_economy  = sum([i['e'] for i in self.stars])
         self.total_industry = sum([i['i'] for i in self.stars])
         self.total_stars = len(self.stars)
-        self.star_quality = statistics.mean([i['nr'] for i in self.stars])
+        try:
+            self.star_quality = statistics.mean([i['nr'] for i in self.stars])
+        except statistics.StatisticsError:
+            self.star_quality = 0
         self.model_strength = self.game.modelStrength(self)
    
 
@@ -674,7 +687,7 @@ class Model:
         self.runs = runs
 
     @staticmethod
-    def loadFromFile(config, teams):
+    def loadFromFile(config, teams, engine='openpyxl'):
         '''Returns a Model using settings from config and teams files'''
         
         #Helper function to convert comma sep fields to tuple
@@ -686,7 +699,8 @@ class Model:
         
         
         teams = pd.read_excel(teams, 
-                              converters = {'priorities' : convert_priorities})
+                              converters = {'priorities' : convert_priorities},
+                              engine = engine)
         
         teams = teams.transpose().to_dict()
         teams = [v for v in teams.values()]
