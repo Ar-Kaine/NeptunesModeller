@@ -2,7 +2,7 @@
 """
 Created on Thu Jul 30 14:34:05 2020
 
-@author: Jamie
+S
 @auhor: Kaine
 """
 import requests
@@ -12,7 +12,7 @@ import json
 import copy
 import random
 import statistics
-
+import odf
 
 
 #Game settings information and conversions used across different objects
@@ -69,14 +69,20 @@ class Connection:
         if game_id and api_key:
             self.game_id = game_id
             self.api_key = api_key
+        if game_id and api_key==None:
+            self.game_id = game_id
+            self.api_key = None
         elif filename:
             config = json.load(open(filename, 'r'))
             self.game_id = config['game_id']
-            self.api_key = config['api_key']
+            try:
+                self.api_key = config['api_key']
+            except KeyError:
+                self.api_key = None
  
         data = self.getData()
         
-        self.name = data.pop('name')
+        self.name = data['name']
         self.fleets = data.pop('fleets')
         self.players =  data.pop('players')
         
@@ -110,20 +116,25 @@ class Connection:
         the data.
         
         '''
-
-        root = "https://np.ironhelmet.com/api"
         
-        params = {"game_number" : self.game_id,
-                 "code" : self.api_key,
-                 "api_version" : "0.1"}
+        if self.api_key == None:
             
-        return requests.post(root, params).json()['scanning_data']
+            root = "https://nptriton.qry.me/game/" + str(self.game_id) + "/full"
+            return requests.post(root).json()
+    
+        else:
+            
+            root = "https://np.ironhelmet.com/api"
+            
+            params = {"game_number" : self.game_id,
+                     "code" : self.api_key,
+                     "api_version" : "0.1"}
+
+            return requests.post(root, params).json()['scanning_data']
     
     
     def toExcel(self, filepath):
         '''Writes the data from the connection to a multi-sheet excel document. 
-        
-        Not implemented
         '''
         stars = pd.DataFrame(self.stars).transpose()
         players = copy.deepcopy(self.players)
@@ -145,32 +156,41 @@ class Connection:
         
         puid = str(self.settings['player_uid'])
         
-        techs = pd.DataFrame(self.players[puid]['tech']).transpose()
+        if puid != "-1":
+            
+            techs = pd.DataFrame(self.players[puid]['tech']).transpose()
+            
+            #Parses the war information which is spread in weird ways
+            war = []
+            
+            for k in self.players[puid]['war']:
+                row = {'player_id' : k ,
+                       'war' : self.players[puid]['war'][k],
+                       'countdown_to_war' : self.players[puid]['countdown_to_war'][k]}
+                war.append(row)
+            war = pd.DataFrame(war)
         
-        #Parses the war information which is spread in weird ways
-        war = []
-        
-        for k in self.players[puid]['war']:
-            row = {'player_id' : k ,
-                   'war' : self.players[puid]['war'][k],
-                   'countdown_to_war' : self.players[puid]['countdown_to_war'][k]}
-            war.append(row)
-        war = pd.DataFrame(war)
+        fleets = pd.DataFrame(self.fleets).transpose()
         
         writer = pd.ExcelWriter(filepath)
 
         timeset.to_excel(writer,'settings')        
         stars.to_excel(writer, 'stars')
         players.to_excel(writer, 'players')
-        techs.to_excel(writer, 'player_technology')
-        war.to_excel(writer, 'player_war')
+        fleets.to_excel(writer, 'fleets')
+        
+        try:
+            techs.to_excel(writer, 'player_technology')
+            war.to_excel(writer, 'player_war')
+        except AttributeError:
+            pass
 
         
         writer.save()
     
     
     
-    def createPlayer(self,spend=SPEND,priorities=None):
+    def createPlayer(self,player=None, spend=SPEND,priorities=None):
         '''Returns a PlayerModel representing the active player
         
         The created PlayerModel willl match to the game settings, stars and
@@ -187,8 +207,18 @@ class Connection:
         research - they will always research the lowest tech. 
         
         '''
-        #'researching' is a value only on the active player
-        active_player = [i for i in self.players.values() if 'researching' in i.keys()][0]
+        
+        if player == None:
+            #'researching' is a value only on the active playe
+            active_player = [i for i in self.players.values() if 'researching' in i.keys()][0]
+            
+        else:
+            active_player = self.players[str(player)]
+            main_player = [i for i in self.players.values() if 'researching' in i.keys()][0]
+            dif = [i for i in main_player.keys() if i not in active_player.keys()]
+            for i in dif:
+                active_player[i] = copy.deepcopy(main_player[i])
+            
         
         if not priorities:
             priorities = [active_player['researching']]
@@ -294,7 +324,7 @@ class Game:
                 ind = int(statistics.mean(i['i'] for i in all_stars))
                 sci = int(statistics.mean(i['s'] for i in all_stars))
          
-            elif self.growth_type == 'new':
+            elif growth_type == 'new':
                 eco = 0
                 ind = 0
                 sci = 0
@@ -460,7 +490,7 @@ class PlayerModel:
     def buyTech(self, tech):
         '''Buys the next level of technology if funds are available'''
         current_level = self.techs[tech]['level']
-        tech_cost = current_level * 15
+        tech_cost = current_level * 25
         if tech_cost <= self.funds:
             self.funds -= tech_cost
             self.setTech(current_level + 1, [tech])
@@ -499,7 +529,10 @@ class PlayerModel:
         self.total_economy  = sum([i['e'] for i in self.stars])
         self.total_industry = sum([i['i'] for i in self.stars])
         self.total_stars = len(self.stars)
-        self.star_quality = statistics.mean([i['nr'] for i in self.stars])
+        try:
+            self.star_quality = statistics.mean([i['nr'] for i in self.stars])
+        except statistics.StatisticsError:
+            self.star_quality = 0
         self.model_strength = self.game.modelStrength(self)
    
 
@@ -654,7 +687,7 @@ class Model:
         self.runs = runs
 
     @staticmethod
-    def loadFromFile(config, teams):
+    def loadFromFile(config, teams, engine='openpyxl'):
         '''Returns a Model using settings from config and teams files'''
         
         #Helper function to convert comma sep fields to tuple
@@ -666,7 +699,8 @@ class Model:
         
         
         teams = pd.read_excel(teams, 
-                              converters = {'priorities' : convert_priorities})
+                              converters = {'priorities' : convert_priorities},
+                              engine = engine)
         
         teams = teams.transpose().to_dict()
         teams = [v for v in teams.values()]
