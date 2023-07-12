@@ -2,3 +2,4 @@
 /inputs
 *.pyc
 test*
+*.json
